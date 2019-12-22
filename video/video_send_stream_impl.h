@@ -32,6 +32,7 @@
 #include "call/rtp_transport_controller_send_interface.h"
 #include "call/rtp_video_sender_interface.h"
 #include "modules/include/module_common_types.h"
+#include "modules/recording/recorder.h"
 #include "modules/rtp_rtcp/include/rtp_rtcp_defines.h"
 #include "modules/utility/include/process_thread.h"
 #include "modules/video_coding/include/video_codec_interface.h"
@@ -102,6 +103,8 @@ class VideoSendStreamImpl : public webrtc::BitrateAllocatorObserver,
   void UpdateActiveSimulcastLayers(const std::vector<bool> active_layers);
   void Start();
   void Stop();
+
+  void InjectRecorder(Recorder* recorder);
 
   // TODO(holmer): Move these to RtpTransportControllerSend.
   std::map<uint32_t, RtpState> GetRtpStates() const;
@@ -198,6 +201,9 @@ class VideoSendStreamImpl : public webrtc::BitrateAllocatorObserver,
   };
   absl::optional<VbaSendContext> video_bitrate_allocation_context_
       RTC_GUARDED_BY(worker_queue_);
+
+  rtc::CriticalSection recorder_lock_;
+  Recorder* recorder_ RTC_GUARDED_BY(recorder_lock_);
 };
 }  // namespace internal
 }  // namespace webrtc

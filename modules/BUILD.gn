@@ -17,6 +17,7 @@ group("modules") {
     "audio_processing",
     "congestion_controller",
     "pacing",
+    "recording",
     "remote_bitrate_estimator",
     "rtp_rtcp",
     "utility",

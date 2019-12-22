@@ -215,7 +215,8 @@ VideoSendStreamImpl::VideoSendStreamImpl(
           event_log,
           std::move(fec_controller),
           CreateFrameEncryptionConfig(config_))),
-      weak_ptr_factory_(this) {
+      weak_ptr_factory_(this),
+      recorder_(nullptr) {
   video_stream_encoder->SetFecControllerOverride(rtp_video_sender_);
   RTC_DCHECK_RUN_ON(worker_queue_);
   RTC_LOG(LS_INFO) << "VideoSendStreamInternal: " << config_->ToString();
@@ -381,6 +382,22 @@ void VideoSendStreamImpl::Stop() {
   TRACE_EVENT_INSTANT0("webrtc", "VideoSendStream::Stop");
   rtp_video_sender_->SetActive(false);
   StopVideoSendStream();
+}
+
+void VideoSendStreamImpl::InjectRecorder(Recorder* recorder) {
+  char log_buf[16];
+  snprintf(log_buf, sizeof(log_buf) - 1, "%p", recorder);
+  RTC_LOG(LS_INFO) << "VideoSendStream::InjectRecorder " << log_buf;
+  {
+    rtc::CritScope lock(&recorder_lock_);
+    recorder_ = recorder;
+  }
+
+  if (recorder) {
+    worker_queue_->PostTask([=] {
+      video_stream_encoder_->SendKeyFrame();
+    });
+  }
 }
 
 void VideoSendStreamImpl::StopVideoSendStream() {
@@ -566,6 +583,13 @@ EncodedImageCallback::Result VideoSendStreamImpl::OnEncodedImage(
     worker_queue_->PostTask(enable_padding_task);
   } else {
     enable_padding_task();
+  }
+
+  {
+    rtc::CritScope lock(&recorder_lock_);
+    if (recorder_) {
+      recorder_->AddVideoFrame(&encoded_image, codec_specific_info->codecType);
+    }
   }
 
   EncodedImageCallback::Result result(EncodedImageCallback::Result::OK);

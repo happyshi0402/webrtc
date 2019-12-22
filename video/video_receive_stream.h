@@ -133,6 +133,8 @@ class VideoReceiveStream : public webrtc::VideoReceiveStream,
                                          bool generate_key_frame) override;
   void GenerateKeyFrame() override;
 
+  void InjectRecorder(Recorder* recorder) override;
+
  private:
   int64_t GetWaitMs() const;
   void StartNextDecode() RTC_RUN_ON(decode_queue_);
@@ -229,6 +231,9 @@ class VideoReceiveStream : public webrtc::VideoReceiveStream,
 
   // Defined last so they are destroyed before all other members.
   rtc::TaskQueue decode_queue_;
+
+  rtc::CriticalSection recorder_lock_;
+  Recorder* recorder_ RTC_GUARDED_BY(recorder_lock_);
 };
 }  // namespace internal
 }  // namespace webrtc

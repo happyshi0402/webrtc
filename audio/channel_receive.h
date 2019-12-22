@@ -27,6 +27,7 @@
 #include "call/rtp_packet_sink_interface.h"
 #include "call/syncable.h"
 #include "modules/audio_coding/include/audio_coding_module_typedefs.h"
+#include "modules/recording/recorder.h"
 #include "system_wrappers/include/clock.h"
 
 // TODO(solenberg, nisse): This file contains a few NOLINT marks, to silence
@@ -137,6 +138,8 @@ class ChannelReceiveInterface : public RtpPacketSinkInterface {
   // Used for obtaining RTT for a receive-only channel.
   virtual void SetAssociatedSendChannel(
       const ChannelSendInterface* channel) = 0;
+
+  virtual void InjectRecorder(Recorder* recorder) = 0;
 };
 
 std::unique_ptr<ChannelReceiveInterface> CreateChannelReceive(

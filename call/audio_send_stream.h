@@ -27,6 +27,7 @@
 #include "api/scoped_refptr.h"
 #include "call/rtp_config.h"
 #include "modules/audio_processing/include/audio_processing_statistics.h"
+#include "modules/recording/recorder.h"
 #include "modules/rtp_rtcp/include/report_block_data.h"
 
 namespace webrtc {
@@ -188,6 +189,8 @@ class AudioSendStream {
 
   virtual Stats GetStats() const = 0;
   virtual Stats GetStats(bool has_remote_tracks) const = 0;
+
+  virtual void InjectRecorder(Recorder* recorder) = 0;
 };
 }  // namespace webrtc
 

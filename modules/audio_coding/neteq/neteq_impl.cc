@@ -137,7 +137,9 @@ NetEqImpl::NetEqImpl(const NetEq::Config& config,
                                 10,  // Report once every 10 s.
                                 tick_timer_.get()),
       no_time_stretching_(config.for_test_no_time_stretching),
-      enable_rtx_handling_(config.enable_rtx_handling) {
+      enable_rtx_handling_(config.enable_rtx_handling),
+      recorder_(nullptr),
+      channel_num_(0) {
   RTC_LOG(LS_INFO) << "NetEq config: " << config.ToString();
   int fs = config.sample_rate_hz;
   if (fs != 8000 && fs != 16000 && fs != 32000 && fs != 48000) {
@@ -465,6 +467,14 @@ int NetEqImpl::SyncBufferSizeMs() const {
   rtc::CritScope lock(&crit_sect_);
   return rtc::dchecked_cast<int>(sync_buffer_->FutureLength() /
                                  rtc::CheckedDivExact(fs_hz_, 1000));
+}
+
+void NetEqImpl::InjectRecorder(Recorder* recorder) {
+  char log_buf[16];
+  snprintf(log_buf, sizeof(log_buf) - 1, "%p", recorder);
+  RTC_LOG(LS_INFO) << "NetEqImpl::InjectRecorder " << log_buf;
+  rtc::CritScope lock(&recorder_lock_);
+  recorder_ = recorder;
 }
 
 const SyncBuffer* NetEqImpl::sync_buffer_for_test() const {
@@ -1447,6 +1457,16 @@ int NetEqImpl::DecodeLoop(PacketList* packet_list,
            operation == Operation::kMerge ||
            operation == Operation::kPreemptiveExpand);
 
+    {
+      rtc::CritScope lock(&recorder_lock_);
+      if (packet_list->front().frame->PayloadSize() > 0 && recorder_) {
+        recorder_->AddAudioFrame(fs_hz_, channel_num_,
+                                 packet_list->front().frame->PayloadData(),
+                                 packet_list->front().frame->PayloadSize(),
+                                 packet_list->front().frame->CodecType());
+      }
+    }
+
     auto opt_result = packet_list->front().frame->Decode(
         rtc::ArrayView<int16_t>(&decoded_buffer_[*decoded_length],
                                 decoded_buffer_length_ - *decoded_length));
@@ -2037,6 +2057,7 @@ void NetEqImpl::SetSampleRateAndChannels(int fs_hz, size_t channels) {
   fs_mult_ = fs_hz / 8000;
   output_size_samples_ = static_cast<size_t>(kOutputSizeMs * 8 * fs_mult_);
   decoder_frame_length_ = 3 * output_size_samples_;  // Initialize to 30ms.
+  channel_num_ = channels;
 
   last_mode_ = Mode::kNormal;
 

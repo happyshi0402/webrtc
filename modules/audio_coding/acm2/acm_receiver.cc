@@ -329,6 +329,10 @@ void AcmReceiver::GetDecodingCallStatistics(
   *stats = call_stats_.GetDecodingStatistics();
 }
 
+void AcmReceiver::InjectRecorder(Recorder* recorder) {
+  neteq_->InjectRecorder(recorder);
+}
+
 }  // namespace acm2
 
 }  // namespace webrtc

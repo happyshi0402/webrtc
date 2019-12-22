@@ -74,6 +74,8 @@ class AudioReceiveStream final : public webrtc::AudioReceiveStream,
   int GetBaseMinimumPlayoutDelayMs() const override;
   std::vector<webrtc::RtpSource> GetSources() const override;
 
+  void InjectRecorder(Recorder* recorder) override;
+
   // TODO(nisse): We don't formally implement RtpPacketSinkInterface, and this
   // method shouldn't be needed. But it's currently used by the
   // AudioReceiveStreamTest.ReceiveRtpPacket unittest. Figure out if that test

@@ -255,6 +255,7 @@ rtc_library("call") {
     "../modules:module_api",
     "../modules/congestion_controller",
     "../modules/pacing",
+    "../modules/recording:recording",
     "../modules/rtp_rtcp",
     "../modules/rtp_rtcp:rtp_rtcp_format",
     "../modules/utility",

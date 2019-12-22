@@ -25,6 +25,7 @@
 #include "api/scoped_refptr.h"
 #include "api/transport/rtp/rtp_source.h"
 #include "call/rtp_config.h"
+#include "modules/recording/recorder.h"
 
 namespace webrtc {
 class AudioSinkInterface;
@@ -186,6 +187,8 @@ class AudioReceiveStream {
   virtual int GetBaseMinimumPlayoutDelayMs() const = 0;
 
   virtual std::vector<RtpSource> GetSources() const = 0;
+
+  virtual void InjectRecorder(Recorder* recorder) = 0;
 
  protected:
   virtual ~AudioReceiveStream() {}

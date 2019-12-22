@@ -29,6 +29,7 @@
 #include "modules/audio_coding/neteq/packet.h"
 #include "modules/audio_coding/neteq/random_vector.h"
 #include "modules/audio_coding/neteq/statistics_calculator.h"
+#include "modules/recording/recorder.h"
 #include "rtc_base/constructor_magic.h"
 #include "rtc_base/critical_section.h"
 #include "rtc_base/thread_annotations.h"
@@ -192,6 +193,8 @@ class NetEqImpl : public webrtc::NetEq {
   std::vector<uint32_t> LastDecodedTimestamps() const override;
 
   int SyncBufferSizeMs() const override;
+
+  void InjectRecorder(Recorder* recorder) override;
 
   // This accessor method is only intended for testing purposes.
   const SyncBuffer* sync_buffer_for_test() const;
@@ -405,6 +408,10 @@ class NetEqImpl : public webrtc::NetEq {
 
  private:
   RTC_DISALLOW_COPY_AND_ASSIGN(NetEqImpl);
+
+  rtc::CriticalSection recorder_lock_;
+  Recorder* recorder_ RTC_GUARDED_BY(recorder_lock_);
+  int channel_num_;
 };
 
 }  // namespace webrtc
