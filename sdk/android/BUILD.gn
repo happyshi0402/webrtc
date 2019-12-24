@@ -897,6 +897,7 @@ if (current_os == "linux" || is_android) {
       "native_api/jni/jvm.cc",
       "src/jni/jni_generator_helper.cc",
       "src/jni/jni_generator_helper.h",
+      "src/jni/audio_mixer_jni.cc",
     ]
 
     public = [
@@ -912,6 +913,7 @@ if (current_os == "linux" || is_android) {
       ":generated_native_api_jni",
       ":internal_jni",
       "//api:array_view",
+      "//modules/backing_track:backing_track",
       "//rtc_base:checks",
       "//rtc_base:rtc_base_approved",
       "//third_party/abseil-cpp/absl/types:optional",

@@ -1244,6 +1244,7 @@ if (is_ios || is_mac) {
         output_name = "WebRTC"
 
         common_objc_headers = [
+          "objc/avconf/CFAudioMixer.h",
           "objc/avconf/CFHijackCapturerDelegate.h",
           "objc/base/RTCCodecSpecificInfo.h",
           "objc/base/RTCEncodedImage.h",
@@ -1733,12 +1734,15 @@ if (is_ios || is_mac) {
 
     rtc_library("avconf_objc") {
       sources = [
+        "objc/avconf/CFAudioMixer.h",
+        "objc/avconf/CFAudioMixer.mm",
         "objc/avconf/CFHijackCapturerDelegate.h",
         "objc/avconf/CFHijackCapturerDelegate.mm",
       ]
 
       deps = [
         ":base_objc",
+        "//modules/backing_track:backing_track",
       ]
 
       configs += [

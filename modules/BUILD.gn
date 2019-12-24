@@ -28,6 +28,9 @@ group("modules") {
   if (rtc_desktop_capture_supported) {
     deps += [ "desktop_capture" ]
   }
+  if (is_android || is_ios) {
+    deps += [ "backing_track" ]
+  }
 }
 
 rtc_source_set("module_api_public") {
