@@ -1244,8 +1244,6 @@ if (is_ios || is_mac) {
         output_name = "WebRTC"
 
         common_objc_headers = [
-          "objc/avconf/CFAudioMixer.h",
-          "objc/avconf/CFHijackCapturerDelegate.h",
           "objc/base/RTCCodecSpecificInfo.h",
           "objc/base/RTCEncodedImage.h",
           "objc/base/RTCI420Buffer.h",
@@ -1328,6 +1326,9 @@ if (is_ios || is_mac) {
           "objc/api/video_codec/RTCVideoEncoderVP9.h",
           "objc/api/video_frame_buffer/RTCNativeI420Buffer.h",
           "objc/api/video_frame_buffer/RTCNativeMutableI420Buffer.h",
+          "objc/avconf/CFAudioMixer.h",
+          "objc/avconf/CFHijackCapturerDelegate.h",
+          "objc/avconf/CFRPCapturer.h",
         ]
 
         if (!build_with_chromium) {
@@ -1460,7 +1461,6 @@ if (is_ios || is_mac) {
           "objc/api/video_codec/RTCVideoEncoderVP9.h",
           "objc/api/video_frame_buffer/RTCNativeI420Buffer.h",
           "objc/api/video_frame_buffer/RTCNativeMutableI420Buffer.h",
-          "objc/avconf/CFHijackCapturerDelegate.h",
           "objc/base/RTCCodecSpecificInfo.h",
           "objc/base/RTCEncodedImage.h",
           "objc/base/RTCI420Buffer.h",
@@ -1738,11 +1738,17 @@ if (is_ios || is_mac) {
         "objc/avconf/CFAudioMixer.mm",
         "objc/avconf/CFHijackCapturerDelegate.h",
         "objc/avconf/CFHijackCapturerDelegate.mm",
+        "objc/avconf/CFRPCapturer.h",
+        "objc/avconf/CFRPCapturer.m",
       ]
 
       deps = [
         ":base_objc",
         "//modules/backing_track:backing_track",
+      ]
+
+      libs = [
+        "ReplayKit.framework",
       ]
 
       configs += [
